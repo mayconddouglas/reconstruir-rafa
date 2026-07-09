@@ -1,0 +1,8 @@
+{
+  "name": "RECONSTRUIR Obras e Reformas",
+  "description": "Landing page para a RECONSTRUIR, empresa de construção civil e reformas em Pernambuco.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
