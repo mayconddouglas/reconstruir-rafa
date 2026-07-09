@@ -608,6 +608,7 @@ export default function App() {
               >
                 <source src="https://videos.pexels.com/video-files/3773486/3773486-sd_640_360_30fps.mp4" type="video/mp4" />
               </video>
+              <div className="absolute inset-0 bg-black opacity-87" />
             </div>
             
             {/* Gradient masks for seamless blending */}
