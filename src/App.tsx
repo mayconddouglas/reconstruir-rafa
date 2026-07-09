@@ -7,6 +7,7 @@ import { useState, useEffect, useRef, ReactNode } from 'react';
 import { ArrowRight, CheckCircle, ChevronRight, ChevronLeft, ChevronDown, Star, Menu, MessageCircle, Phone, X, Instagram, Mail, MapPin, ShieldCheck, Clock, Award } from 'lucide-react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'motion/react';
 import QuoteModal from './components/QuoteModal';
+import { BackToTopButton } from './components/BackToTopButton';
 
 const NAV_LINKS = [
   { id: 'sobre', label: 'Sobre Nós' },
@@ -25,7 +26,7 @@ const TESTIMONIALS = [
     rating: 5,
     code: "SYS // TST-01",
     tag: "OBRA RESIDENCIAL DE LUXO",
-    bgImage: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=50",
+    bgImage: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=50&fm=webp",
   },
   {
     id: 2,
@@ -35,7 +36,7 @@ const TESTIMONIALS = [
     rating: 5,
     code: "SYS // TST-02",
     tag: "OBRA COMERCIAL COMPLEXA",
-    bgImage: "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=1200&q=50",
+    bgImage: "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=1200&q=50&fm=webp",
   },
   {
     id: 3,
@@ -45,7 +46,7 @@ const TESTIMONIALS = [
     rating: 5,
     code: "SYS // TST-03",
     tag: "PARCERIA TÉCNICA // ARQUITETURA",
-    bgImage: "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1200&q=50",
+    bgImage: "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1200&q=50&fm=webp",
   },
 ];
 
@@ -348,27 +349,27 @@ export default function App() {
   }, [isLoading]);
   
   const col1Images = [
-    "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=480&q=50",
-    "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=480&q=50",
-    "https://images.unsplash.com/photo-1613490908592-fd5a121345d7?auto=format&fit=crop&w=480&q=50",
-    "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=480&q=50",
-    "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=480&q=50"
+    "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=480&q=50&fm=webp",
+    "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=480&q=50&fm=webp",
+    "https://images.unsplash.com/photo-1613490908592-fd5a121345d7?auto=format&fit=crop&w=480&q=50&fm=webp",
+    "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=480&q=50&fm=webp",
+    "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=480&q=50&fm=webp"
   ];
 
   const col2Images = [
-    "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=480&q=50",
-    "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=480&q=50",
-    "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=480&q=50",
-    "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=480&q=50",
-    "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=480&q=50"
+    "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=480&q=50&fm=webp",
+    "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=480&q=50&fm=webp",
+    "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=480&q=50&fm=webp",
+    "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=480&q=50&fm=webp",
+    "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=480&q=50&fm=webp"
   ];
 
   const col3Images = [
-    "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=480&q=50",
-    "https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=480&q=50",
-    "https://images.unsplash.com/photo-1512915922686-57c11dde9b6b?auto=format&fit=crop&w=480&q=50",
-    "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=480&q=50",
-    "https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=480&q=50"
+    "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=480&q=50&fm=webp",
+    "https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=480&q=50&fm=webp",
+    "https://images.unsplash.com/photo-1512915922686-57c11dde9b6b?auto=format&fit=crop&w=480&q=50&fm=webp",
+    "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=480&q=50&fm=webp",
+    "https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=480&q=50&fm=webp"
   ];
 
   const fullCol1 = [...col1Images, ...col1Images];
@@ -536,7 +537,7 @@ export default function App() {
                 playsInline 
                 className="w-full h-full object-cover"
               >
-                <source src="https://videos.pexels.com/video-files/3773486/3773486-hd_1920_1080_30fps.mp4" type="video/mp4" />
+                <source src="https://videos.pexels.com/video-files/3773486/3773486-sd_640_360_30fps.mp4" type="video/mp4" />
               </video>
             </div>
             
@@ -860,7 +861,7 @@ export default function App() {
                     <div className="grid md:grid-cols-12 gap-6 items-center">
                       <div className="md:col-span-5 h-[240px] md:h-[280px] lg:h-[320px] overflow-hidden rounded-[1.25rem] relative m-2">
                         <img 
-                          src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=600&q=60" 
+                          src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=600&q=60&fm=webp" 
                           alt="Instalação Elétrica" 
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
                           referrerPolicy="no-referrer"
@@ -911,7 +912,7 @@ export default function App() {
                     <div className="grid md:grid-cols-12 gap-6 items-center">
                       <div className="md:col-span-5 h-[240px] md:h-[280px] lg:h-[320px] overflow-hidden rounded-[1.25rem] relative m-2 md:order-2">
                         <img 
-                          src="https://images.unsplash.com/photo-1589939705384-5185137a7f0f?auto=format&fit=crop&w=600&q=60" 
+                          src="https://images.unsplash.com/photo-1589939705384-5185137a7f0f?auto=format&fit=crop&w=600&q=60&fm=webp" 
                           alt="Pintura e Acabamento" 
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
                           referrerPolicy="no-referrer"
@@ -963,7 +964,7 @@ export default function App() {
                       <div className="space-y-4">
                         <div className="h-[180px] md:h-[200px] lg:h-[240px] overflow-hidden rounded-[1.25rem] relative m-2">
                           <img 
-                            src="https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=500&q=60" 
+                            src="https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=500&q=60&fm=webp" 
                             alt="Gesso" 
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
                             referrerPolicy="no-referrer"
@@ -1012,7 +1013,7 @@ export default function App() {
                       <div className="space-y-4">
                         <div className="h-[180px] md:h-[200px] lg:h-[240px] overflow-hidden rounded-[1.25rem] relative m-2">
                           <img 
-                            src="https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=500&q=60" 
+                            src="https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=500&q=60&fm=webp" 
                             alt="Revestimentos" 
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
                             referrerPolicy="no-referrer"
@@ -1086,7 +1087,7 @@ export default function App() {
                       idCode="// PROJETO RES-01"
                       area="450m²"
                       title="Residência Minimalista de Alto Padrão"
-                      imgUrl="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=50"
+                      imgUrl="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=50&fm=webp"
                       widthClass="w-full"
                       heightClass="h-[320px] sm:h-[380px] md:h-[460px] lg:h-[480px]"
                       index={0}
@@ -1098,7 +1099,7 @@ export default function App() {
                       idCode="// PROJETO COM-02"
                       area="1.200m²"
                       title="Sede Corporativa Concept"
-                      imgUrl="https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=800&q=50"
+                      imgUrl="https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=800&q=50&fm=webp"
                       widthClass="w-full"
                       heightClass="h-[320px] sm:h-[380px] md:h-[460px] lg:h-[480px]"
                       index={1}
@@ -1110,7 +1111,7 @@ export default function App() {
                       idCode="// PROJETO INT-03"
                       area="180m²"
                       title="Apartamento Loft Industrial"
-                      imgUrl="https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=800&q=50"
+                      imgUrl="https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=800&q=50&fm=webp"
                       widthClass="w-full"
                       heightClass="h-[320px] sm:h-[380px] md:h-[460px] lg:h-[480px]"
                       index={2}
@@ -1478,6 +1479,7 @@ export default function App() {
       </footer>
 
       <QuoteModal isOpen={isQuoteModalOpen} onClose={() => setIsQuoteModalOpen(false)} />
+      <BackToTopButton />
     </div>
   );
 }
