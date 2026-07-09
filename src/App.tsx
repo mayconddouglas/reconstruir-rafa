@@ -5,7 +5,7 @@
 
 import { useState, useEffect, useRef, ReactNode } from 'react';
 import { ArrowRight, CheckCircle, ChevronRight, ChevronLeft, ChevronDown, Star, Menu, MessageCircle, Phone, X, Instagram, Mail, MapPin, ShieldCheck, Clock, Award } from 'lucide-react';
-import { motion, AnimatePresence, useScroll, useTransform } from 'motion/react';
+import { motion, AnimatePresence, useScroll, useTransform, useSpring, useMotionTemplate } from 'motion/react';
 import QuoteModal from './components/QuoteModal';
 import { BackToTopButton } from './components/BackToTopButton';
 
@@ -254,6 +254,18 @@ const staggerItemVariants = {
   }
 };
 
+const aboutItemVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 1.2,
+      ease: [0.16, 1, 0.3, 1]
+    }
+  }
+};
+
 interface RevealStaggerProps {
   children: ReactNode;
   className?: string;
@@ -275,10 +287,10 @@ function RevealStagger({ children, className = "", once = true, margin = "-50px"
   );
 }
 
-function RevealItem({ children, className = "" }: { children: ReactNode; className?: string }) {
+function RevealItem({ children, className = "", variants = staggerItemVariants }: { children: ReactNode; className?: string; variants?: any }) {
   return (
     <motion.div
-      variants={staggerItemVariants}
+      variants={variants}
       className={className}
     >
       {children}
@@ -290,6 +302,8 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [showNav, setShowNav] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const [activeSection, setActiveSection] = useState('');
   const heroRef = useRef<HTMLDivElement>(null);
 
@@ -301,13 +315,51 @@ export default function App() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [translateX, setTranslateX] = useState(0);
 
-  const { scrollYProgress: portfolioScrollY } = useScroll({
-    target: portfolioScrollRef,
+  const aboutRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress: aboutScrollYRaw } = useScroll({
+    target: aboutRef,
     offset: ["start start", "end end"]
   });
 
+  const aboutScrollY = useSpring(aboutScrollYRaw, { stiffness: 80, damping: 20, restDelta: 0.001 });
+
+  // Intro texts
+  const introOpacity = useTransform(aboutScrollY, [0.35, 0.4], [1, 0]);
+  const introPointerEvents = useTransform(aboutScrollY, (v) => (v > 0.4 ? "none" : "auto"));
+  const opacityS1 = useTransform(aboutScrollY, [0, 0.05, 0.15], [0, 0, 1]);
+  const opacityS2 = useTransform(aboutScrollY, [0, 0.15, 0.25], [0, 0, 1]);
+  const yS1 = useTransform(aboutScrollY, [0, 0.05, 0.15], [40, 40, 0]);
+  const yS2 = useTransform(aboutScrollY, [0, 0.15, 0.25], [40, 40, 0]);
+
+  // Card 1
+  const radiusC1 = useTransform(aboutScrollY, [0.4, 0.55], [0, 150]);
+  const clipPathC1 = useMotionTemplate`circle(${radiusC1}% at center)`;
+  const scaleC1 = useTransform(aboutScrollY, [0.4, 0.6], [0.8, 1]);
+  const opacityC1 = useTransform(aboutScrollY, [0.4, 0.45], [0, 1]);
+  const pointerEventsC1 = useTransform(aboutScrollY, (v) => (v > 0.4 && v < 0.6 ? "auto" : "none"));
+
+  // Card 2
+  const radiusC2 = useTransform(aboutScrollY, [0.6, 0.75], [0, 150]);
+  const clipPathC2 = useMotionTemplate`circle(${radiusC2}% at center)`;
+  const scaleC2 = useTransform(aboutScrollY, [0.6, 0.8], [0.8, 1]);
+  const opacityC2 = useTransform(aboutScrollY, [0.6, 0.65], [0, 1]);
+  const pointerEventsC2 = useTransform(aboutScrollY, (v) => (v > 0.6 && v < 0.8 ? "auto" : "none"));
+
+  // Card 3
+  const radiusC3 = useTransform(aboutScrollY, [0.8, 0.95], [0, 150]);
+  const clipPathC3 = useMotionTemplate`circle(${radiusC3}% at center)`;
+  const scaleC3 = useTransform(aboutScrollY, [0.8, 1.0], [0.8, 1]);
+  const opacityC3 = useTransform(aboutScrollY, [0.8, 0.85], [0, 1]);
+  const pointerEventsC3 = useTransform(aboutScrollY, (v) => (v > 0.8 ? "auto" : "none"));
+
+  const { scrollYProgress: portfolioScrollY } = useScroll({
+    target: portfolioScrollRef,
+    offset: ["start start", "end end"]
+    });
+
   useEffect(() => {
     const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
       if (scrollRef.current) {
         const scrollWidth = scrollRef.current.scrollWidth;
         const clientWidth = scrollRef.current.clientWidth;
@@ -394,6 +446,18 @@ export default function App() {
         }
       }
       setActiveSection(currentActive);
+      
+      const hero = heroRef.current;
+      let shouldShowNav = false;
+      if (hero) {
+        shouldShowNav = hero.getBoundingClientRect().bottom <= 100;
+      } else {
+        shouldShowNav = window.scrollY > window.innerHeight * 0.5;
+      }
+      setShowNav(shouldShowNav);
+      if (!shouldShowNav) {
+        setIsMobileMenuOpen(false);
+      }
     };
     
     window.addEventListener('scroll', handleScroll);
@@ -421,24 +485,27 @@ export default function App() {
       </AnimatePresence>
 
       {/* Navigation */}
-      <motion.nav 
-        initial={{ y: -50, opacity: 0 }}
-        animate={{ 
-          y: 0, 
-          opacity: 1,
-        }}
-        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        className={`fixed top-0 w-full z-50 transition-all duration-500 pointer-events-none ${
-          scrolled ? 'pt-2.5' : 'pt-5 md:pt-6'
-        }`}
-      >
-        <div 
-          className={`mx-auto flex items-center justify-between px-4 md:px-6 py-2.5 md:py-3 border rounded-full shadow-2xl pointer-events-auto transition-all duration-500 ${
-            scrolled 
-              ? 'max-w-5xl md:max-w-6xl bg-background/85 backdrop-blur-xl border-white/5 shadow-xl' 
-              : 'max-w-5xl md:max-w-6xl bg-background/40 backdrop-blur-md border-white/10 shadow-none'
-          }`}
-        >
+      <AnimatePresence>
+        {showNav && (
+          <motion.nav 
+            initial={{ y: -50, opacity: 0 }}
+            animate={{ 
+              y: 0, 
+              opacity: 1,
+            }}
+            exit={{ y: -50, opacity: 0 }}
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            className={`fixed top-0 w-full z-50 transition-all duration-500 pointer-events-none ${
+              scrolled ? 'pt-2.5' : 'pt-5 md:pt-6'
+            }`}
+          >
+            <div 
+              className={`mx-auto flex items-center justify-between px-4 md:px-6 py-2.5 md:py-3 border rounded-full shadow-2xl pointer-events-auto transition-all duration-500 ${
+                scrolled 
+                  ? 'max-w-5xl md:max-w-6xl bg-background/85 backdrop-blur-xl border-white/5 shadow-xl' 
+                  : 'max-w-5xl md:max-w-6xl bg-background/40 backdrop-blur-md border-white/10 shadow-none'
+              }`}
+            >
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-primary rounded flex items-center justify-center">
               <div className="w-4 h-4 border-2 border-primary-foreground rounded-[3px]" />
@@ -475,13 +542,15 @@ export default function App() {
           </div>
 
           <button 
-            className="md:hidden text-foreground p-1.5 z-50 relative"
+            className="md:hidden text-foreground p-1.5 z-50 relative pointer-events-auto"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
       </motion.nav>
+        )}
+      </AnimatePresence>
 
       {/* Mobile Menu */}
       <AnimatePresence>
@@ -560,7 +629,7 @@ export default function App() {
             >
               <motion.h1 
                 variants={itemVariants}
-                className="font-heading text-4xl md:text-6xl lg:text-7xl font-medium tracking-tight text-balance leading-[1.1] text-center"
+                className="font-heading text-3xl md:text-5xl lg:text-6xl font-medium tracking-tight text-balance leading-[1.1] text-center"
               >
                 Não levamos <span className="text-white/40">problemas,</span><br />
                 levamos{' '}
@@ -585,7 +654,7 @@ export default function App() {
 
               <motion.p 
                 variants={itemVariants} 
-                className="text-muted-foreground text-sm md:text-base lg:text-lg max-w-xl leading-relaxed font-light text-balance"
+                className="text-muted-foreground text-sm md:text-base max-w-xl leading-relaxed font-light text-balance"
               >
                 Há 10 anos executando obras e reformas de alto padrão. Nossa missão é entregar <span className="text-foreground font-medium font-normal">tranquilidade</span> e <span className="text-foreground font-medium font-normal">excelência</span>.
               </motion.p>
@@ -684,136 +753,106 @@ export default function App() {
         </div>
 
         {/* About Section */}
-        <section id="sobre" className="px-4 sm:px-6 md:px-10 lg:px-12 scroll-mt-32">
-          <div className="max-w-4xl lg:max-w-5xl mx-auto">
-            <div className="grid lg:grid-cols-12 gap-8 lg:gap-10 items-start">
-              {/* Left Column (Sticky Indicator) */}
-              <motion.div 
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                className="lg:col-span-3 space-y-1.5 lg:sticky lg:top-32"
-              >
-                <span className="text-[10px] md:text-[11px] font-mono tracking-[0.25em] uppercase text-primary font-medium block">
-                  (01) Sobre Nós
-                </span>
-                <p className="text-muted-foreground text-xs md:text-sm font-light uppercase tracking-widest block">
-                  Construindo confiança.
-                </p>
-              </motion.div>
+        <section id="sobre" ref={aboutRef} className="relative w-full h-[400vh] scroll-mt-32">
+          {/* Sticky container that fits the viewport */}
+          <div className="sticky top-0 h-screen w-full flex items-center justify-center overflow-hidden bg-background">
+            
+            {/* Intro Content */}
+            <motion.div 
+              style={{ opacity: introOpacity, pointerEvents: introPointerEvents as any }}
+              className="absolute inset-0 flex flex-col justify-center px-4 sm:px-6 md:px-10 z-10"
+            >
+              <div className="max-w-4xl lg:max-w-5xl mx-auto w-full">
+                <div className="grid lg:grid-cols-12 gap-8 lg:gap-10 items-center relative">
+                  {/* Left Column (Sticky Indicator) */}
+                  <div className="lg:col-span-4 space-y-1.5">
+                    <span className="text-[10px] md:text-[11px] font-mono tracking-[0.25em] uppercase text-primary font-medium block">
+                      (01) Sobre Nós
+                    </span>
+                    <p className="text-muted-foreground text-xs md:text-sm font-light uppercase tracking-widest block">
+                      Precisão & Rigor.
+                    </p>
+                  </div>
 
-              {/* Right Column (Content) */}
-              <RevealStagger className="lg:col-span-9 space-y-12">
-                <RevealItem>
-                  <h3 className="font-heading text-2xl md:text-4xl lg:text-[2.75rem] font-light tracking-tight text-balance leading-[1.2] text-foreground">
-                    Enquanto muitos focam apenas em fazer o serviço, nós nos preocupamos com a <span className="text-white font-normal">excelência da execução</span>.
-                  </h3>
-                </RevealItem>
-
-                <RevealItem className="grid md:grid-cols-2 gap-5 text-muted-foreground/80 leading-relaxed text-sm md:text-[15px] font-light">
-                  <p>
-                    Trabalhando desde criança e acompanhando meu pai no ramo da construção civil, peguei gosto e decidi seguir por esse caminho. Há 10 anos a RECONSTRUIR transforma projetos em realidade.
-                  </p>
-                  <p>
-                    Sabemos que o cliente muitas vezes opta pelo mais barato e acaba tendo prejuízos. Nosso objetivo é mostrar que qualidade, respeito às normas técnicas e garantia têm um valor agregado que traz paz de espírito.
-                  </p>
-                </RevealItem>
-                
-                {/* Lâmina de Engenharia Grid Columns */}
-                <div className="grid sm:grid-cols-3 gap-4 pt-12 border-t border-white/5">
-                  {/* Card 1: 10 Anos */}
-                  <RevealItem>
-                    <motion.div 
-                      whileHover={{ y: -4 }}
-                      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                      className="relative group p-6 rounded-xl bg-neutral-900/25 backdrop-blur-sm border border-white/5 hover:border-primary/25 transition-all duration-500 overflow-hidden h-full"
-                    >
-                      {/* Left structural "Blade" indicator */}
-                      <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-primary/20 group-hover:bg-primary transition-all duration-500" />
-                      
-                      {/* Architectural blueprint grid overlay (subtle) */}
-                      <div className="absolute right-4 top-4 font-mono text-[9px] text-muted-foreground/30 group-hover:text-primary/40 transition-colors duration-500">
-                        SYS // 0.01
-                      </div>
-                      
-                      <div className="space-y-4">
-                        <div className="flex items-center gap-2 text-primary/80">
-                          <Clock className="w-3.5 h-3.5" />
-                          <span className="text-[10px] font-mono uppercase tracking-[0.15em]">Compromisso</span>
-                        </div>
-                        <div className="space-y-1.5">
-                          <h4 className="font-heading text-lg font-medium text-foreground tracking-tight">10 Anos</h4>
-                          <p className="text-xs md:text-sm text-muted-foreground/75 leading-relaxed font-light">
-                            De experiência sólida no mercado de obras e reformas de alto padrão.
-                          </p>
-                        </div>
-                      </div>
+                  {/* Right Column (Intro Texts) */}
+                  <div className="lg:col-span-8 space-y-8 md:space-y-10 relative flex flex-col justify-center">
+                    <motion.div style={{ opacity: opacityS1, y: yS1 }}>
+                      <h3 className="font-heading text-2xl md:text-4xl lg:text-[2.75rem] font-light tracking-tight text-balance leading-[1.3] text-foreground">
+                        Enquanto muitos focam apenas em fazer o serviço, nós nos preocupamos com a <span className="text-white font-normal">excelência de cada detalhe</span>.
+                      </h3>
                     </motion.div>
-                  </RevealItem>
-
-                  {/* Card 2: Garantia Total */}
-                  <RevealItem>
-                    <motion.div 
-                      whileHover={{ y: -4 }}
-                      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                      className="relative group p-6 rounded-xl bg-[#EAE6E1] border-none shadow-[0_12px_24px_-8px_rgba(0,0,0,0.3)] transition-all duration-500 overflow-hidden h-full text-neutral-900"
-                    >
-                      {/* Left structural "Blade" indicator */}
-                      <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-neutral-800 transition-all duration-500" />
-                      
-                      {/* Architectural blueprint grid overlay (subtle) */}
-                      <div className="absolute right-4 top-4 font-mono text-[9px] text-neutral-600/40 group-hover:text-neutral-950/60 transition-colors duration-500">
-                        SYS // 0.02
-                      </div>
-                      
-                      <div className="space-y-4">
-                        <div className="flex items-center gap-2 text-neutral-800">
-                          <ShieldCheck className="w-3.5 h-3.5" />
-                          <span className="text-[10px] font-mono uppercase tracking-[0.15em] font-medium">Confiança</span>
-                        </div>
-                        <div className="space-y-1.5">
-                          <h4 className="font-heading text-lg font-medium text-neutral-950 tracking-tight">Garantia Total</h4>
-                          <p className="text-xs md:text-sm text-neutral-700 leading-relaxed font-normal">
-                            Pós-venda ativo e compromisso absoluto com o resultado final.
-                          </p>
-                        </div>
-                      </div>
+                    <motion.div style={{ opacity: opacityS2, y: yS2 }}>
+                      <p className="text-base md:text-lg font-light text-muted-foreground/95 leading-relaxed max-w-2xl">
+                        Há 10 anos a RECONSTRUIR transforma projetos em realidade guiando cada etapa com rigor normativo, garantia total e respeito absoluto ao seu investimento.
+                      </p>
                     </motion.div>
-                  </RevealItem>
-
-                  {/* Card 3: Padrão NBR */}
-                  <RevealItem>
-                    <motion.div 
-                      whileHover={{ y: -4 }}
-                      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                      className="relative group p-6 rounded-xl bg-neutral-900/25 backdrop-blur-sm border border-white/5 hover:border-primary/25 transition-all duration-500 overflow-hidden h-full"
-                    >
-                      {/* Left structural "Blade" indicator */}
-                      <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-primary/20 group-hover:bg-primary transition-all duration-500" />
-                      
-                      {/* Architectural blueprint grid overlay (subtle) */}
-                      <div className="absolute right-4 top-4 font-mono text-[9px] text-muted-foreground/30 group-hover:text-primary/40 transition-colors duration-500">
-                        SYS // 0.03
-                      </div>
-                      
-                      <div className="space-y-4">
-                        <div className="flex items-center gap-2 text-primary/80">
-                          <Award className="w-3.5 h-3.5" />
-                          <span className="text-[10px] font-mono uppercase tracking-[0.15em]">Segurança</span>
-                        </div>
-                        <div className="space-y-1.5">
-                          <h4 className="font-heading text-lg font-medium text-foreground tracking-tight">Padrão NBR</h4>
-                          <p className="text-xs md:text-sm text-muted-foreground/75 leading-relaxed font-light">
-                            Obediência rigorosa às normas técnicas nacionais vigentes.
-                          </p>
-                        </div>
-                      </div>
-                    </motion.div>
-                  </RevealItem>
+                  </div>
                 </div>
-              </RevealStagger>
-            </div>
+              </div>
+            </motion.div>
+
+            {/* Card 1: 10 Anos */}
+            <motion.div 
+              style={{ clipPath: clipPathC1, opacity: opacityC1, pointerEvents: pointerEventsC1 as any }}
+              className="absolute inset-0 flex items-center justify-center bg-neutral-900 z-20 px-4"
+            >
+              <motion.div style={{ scale: scaleC1 }} className="flex flex-col items-center text-center space-y-6 max-w-3xl mx-auto">
+                <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-primary/20 flex items-center justify-center mb-2">
+                  <Clock className="w-8 h-8 md:w-10 md:h-10 text-primary" />
+                </div>
+                <div className="space-y-4">
+                  <span className="text-[10px] md:text-[11px] font-mono tracking-[0.25em] uppercase text-primary font-medium block">
+                    Experiência Comprovada
+                  </span>
+                  <h4 className="font-heading text-5xl md:text-7xl lg:text-8xl font-medium text-foreground tracking-tight">10 Anos</h4>
+                  <p className="text-lg md:text-2xl text-muted-foreground/80 leading-relaxed font-light max-w-2xl mx-auto">
+                    Sólida experiência no mercado de obras e reformas. Nossa jornada é marcada pela excelência e entrega pontual de cada projeto.
+                  </p>
+                </div>
+              </motion.div>
+            </motion.div>
+
+            {/* Card 2: Garantia Total */}
+            <motion.div 
+              style={{ clipPath: clipPathC2, opacity: opacityC2, pointerEvents: pointerEventsC2 as any }}
+              className="absolute inset-0 flex items-center justify-center bg-[#EAE6E1] text-neutral-900 z-30 px-4"
+            >
+              <motion.div style={{ scale: scaleC2 }} className="flex flex-col items-center text-center space-y-6 max-w-3xl mx-auto">
+                <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-neutral-800/10 flex items-center justify-center mb-2">
+                  <ShieldCheck className="w-8 h-8 md:w-10 md:h-10 text-neutral-800" />
+                </div>
+                <div className="space-y-4">
+                  <span className="text-[10px] md:text-[11px] font-mono tracking-[0.25em] uppercase text-neutral-600 font-medium block">
+                    Confiança & Segurança
+                  </span>
+                  <h4 className="font-heading text-5xl md:text-7xl lg:text-8xl font-medium text-neutral-950 tracking-tight">Garantia Total</h4>
+                  <p className="text-lg md:text-2xl text-neutral-700 leading-relaxed font-normal max-w-2xl mx-auto">
+                    Pós-venda ativo e compromisso real com a satisfação. Estaremos ao seu lado mesmo depois que a obra for finalizada.
+                  </p>
+                </div>
+              </motion.div>
+            </motion.div>
+
+            {/* Card 3: Padrão NBR */}
+            <motion.div 
+              style={{ clipPath: clipPathC3, opacity: opacityC3, pointerEvents: pointerEventsC3 as any }}
+              className="absolute inset-0 flex items-center justify-center bg-neutral-900 z-40 px-4"
+            >
+              <motion.div style={{ scale: scaleC3 }} className="flex flex-col items-center text-center space-y-6 max-w-3xl mx-auto">
+                <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-primary/20 flex items-center justify-center mb-2">
+                  <Award className="w-8 h-8 md:w-10 md:h-10 text-primary" />
+                </div>
+                <div className="space-y-4">
+                  <span className="text-[10px] md:text-[11px] font-mono tracking-[0.25em] uppercase text-primary font-medium block">
+                    Qualidade Técnica
+                  </span>
+                  <h4 className="font-heading text-5xl md:text-7xl lg:text-8xl font-medium text-foreground tracking-tight">Padrão NBR</h4>
+                  <p className="text-lg md:text-2xl text-muted-foreground/80 leading-relaxed font-light max-w-2xl mx-auto">
+                    Rigidez e respeito integral às normas técnicas nacionais. A segurança estrutural do seu projeto não é negociável.
+                  </p>
+                </div>
+              </motion.div>
+            </motion.div>
           </div>
         </section>
 
