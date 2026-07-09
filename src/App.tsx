@@ -13,7 +13,6 @@ const NAV_LINKS = [
   { id: 'servicos', label: 'Especialidades' },
   { id: 'portfolio', label: 'Portfólio' },
   { id: 'depoimentos', label: 'Depoimentos' },
-  { id: 'faq', label: 'FAQ' },
   { id: 'contato', label: 'Contato' },
 ];
 
@@ -26,6 +25,7 @@ const TESTIMONIALS = [
     rating: 5,
     code: "SYS // TST-01",
     tag: "OBRA RESIDENCIAL DE LUXO",
+    bgImage: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=50",
   },
   {
     id: 2,
@@ -35,6 +35,7 @@ const TESTIMONIALS = [
     rating: 5,
     code: "SYS // TST-02",
     tag: "OBRA COMERCIAL COMPLEXA",
+    bgImage: "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=1200&q=50",
   },
   {
     id: 3,
@@ -44,45 +45,8 @@ const TESTIMONIALS = [
     rating: 5,
     code: "SYS // TST-03",
     tag: "PARCERIA TÉCNICA // ARQUITETURA",
+    bgImage: "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1200&q=50",
   },
-];
-
-const FAQS = [
-  {
-    id: 1,
-    question: "Como é calculado o orçamento de uma obra ou reforma?",
-    answer: "Nossos orçamentos são baseados em um levantamento quantitativo milimétrico do projeto e na composição de custos unitários (SINAPI e cotações de mercado). Desenvolvemos uma planilha orçamentária transparente, detalhando cada etapa, material e hora técnica de engenharia, eliminando taxas ocultas e imprevistos.",
-    code: "SYS // FAQ-01",
-    tag: "ORÇAMENTAÇÃO E CUSTOS"
-  },
-  {
-    id: 2,
-    question: "A Reconstruir fornece garantia pós-obra?",
-    answer: "Sim. Conforme as normas técnicas brasileiras (NBRs) e o Código Civil, oferecemos garantia total de até 5 anos para sistemas estruturais e de impermeabilização, além de garantias específicas para acabamentos e instalações elétricas/hidráulicas descritas em nosso manual de entrega pós-obra.",
-    code: "SYS // FAQ-02",
-    tag: "GARANTIA E NORMAS NBR"
-  },
-  {
-    id: 3,
-    question: "Vocês cuidam da parte de licenciamento e alvarás?",
-    answer: "Prestamos assessoria completa na obtenção de alvarás de construção, reforma, licenças ambientais e habite-se junto aos órgãos municipais e condomínios, garantindo que toda a documentação legal e o recolhimento de ART (Anotação de Responsabilidade Técnica) estejam em plena conformidade antes do início dos trabalhos.",
-    code: "SYS // FAQ-03",
-    tag: "DOCUMENTAÇÃO LEGAL & ART"
-  },
-  {
-    id: 4,
-    question: "Como funciona o acompanhamento do cronograma físico-financeiro?",
-    answer: "Utilizamos metodologias avançadas de planejamento de engenharia (como a Linha de Balanço e diagramas de Gantt). O cliente tem acesso a relatórios de progresso semanais detalhados com fotos e medições reais, permitindo acompanhar o cumprimento rigoroso de cada etapa programada.",
-    code: "SYS // FAQ-04",
-    tag: "PLANEJAMENTO & ENGENHARIA"
-  },
-  {
-    id: 5,
-    question: "Vocês realizam apenas obras de alto padrão ou também comerciais?",
-    answer: "Atuamos tanto no segmento residencial de alto padrão quanto no corporativo/comercial de alta complexidade. Nossa engenharia está capacitada para coordenar cronogramas especiais (como trabalhos noturnos em escritórios) para minimizar o impacto na operação do cliente.",
-    code: "SYS // FAQ-05",
-    tag: "ESCOPO DE ATUAÇÃO"
-  }
 ];
 
 const containerVariants = {
@@ -186,15 +150,6 @@ interface PortfolioCardProps {
 function PortfolioCard({ idCode, area, title, imgUrl, widthClass, heightClass, index }: PortfolioCardProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   
-  // Local scroll tracking for parallax effect on image
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start end", "end start"]
-  });
-  
-  // Translate the image slightly as it moves through the viewport
-  const yParallax = useTransform(scrollYProgress, [0, 1], ["-8%", "8%"]);
-  
   return (
     <motion.div 
       ref={containerRef}
@@ -218,13 +173,12 @@ function PortfolioCard({ idCode, area, title, imgUrl, widthClass, heightClass, i
         transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
       />
 
-      {/* Image Container with Parallax and Zoom */}
+      {/* Image Container with Zoom */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         <motion.img 
-          style={{ y: yParallax }}
           src={imgUrl} 
           alt={title} 
-          className="absolute inset-x-0 -top-[15%] -bottom-[15%] w-full h-[130%] object-cover origin-center"
+          className="absolute inset-0 w-full h-full object-cover origin-center"
           variants={{
             hover: { scale: 1.04 }
           }}
@@ -331,78 +285,6 @@ function RevealItem({ children, className = "" }: { children: ReactNode; classNa
   );
 }
 
-interface FAQItemProps {
-  key?: number | string;
-  question: string;
-  answer: string;
-  code: string;
-  tag: string;
-  isOpen: boolean;
-  onToggle: () => void;
-}
-
-function FAQItem({ question, answer, code, tag, isOpen, onToggle }: FAQItemProps) {
-  return (
-    <div 
-      onClick={onToggle}
-      className="relative group overflow-hidden rounded-xl bg-neutral-900/20 backdrop-blur-sm border border-white/5 hover:border-primary/25 transition-all duration-500 p-6 md:p-8 cursor-pointer select-none"
-    >
-      {/* Left structural "Blade" indicator that expands on active/hover */}
-      <div 
-        className={`absolute left-0 top-0 bottom-0 w-[2px] transition-all duration-500 ${
-          isOpen ? 'bg-primary h-full w-[4px]' : 'bg-primary/20 group-hover:bg-primary/60'
-        }`} 
-      />
-
-      {/* Architectural blueprint grid overlay */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff02_1px,transparent_1px),linear-gradient(to_bottom,#ffffff02_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none opacity-20 group-hover:opacity-40 transition-opacity duration-500" />
-
-      <div className="relative z-10 space-y-4">
-        {/* Top header line */}
-        <div className="flex items-center justify-between">
-          <span className="font-mono text-[9px] text-primary uppercase tracking-widest">
-            // {tag}
-          </span>
-          <span className="font-mono text-[9px] text-muted-foreground/30 group-hover:text-primary/40 transition-colors duration-500">
-            {code}
-          </span>
-        </div>
-
-        {/* Question and toggle icon */}
-        <div className="flex items-start justify-between gap-4">
-          <h4 className="font-heading text-base md:text-lg font-medium text-foreground group-hover:text-white transition-colors tracking-tight">
-            {question}
-          </h4>
-          <motion.div
-            animate={{ rotate: isOpen ? 180 : 0 }}
-            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="p-1 rounded-full border border-white/5 bg-white/5 text-muted-foreground group-hover:text-white group-hover:border-white/10 transition-colors flex-shrink-0"
-          >
-            <ChevronDown className="w-4 h-4" />
-          </motion.div>
-        </div>
-
-        {/* Answer with smooth height and opacity transitions using motion */}
-        <AnimatePresence initial={false}>
-          {isOpen && (
-            <motion.div
-              initial={{ height: 0, opacity: 0, marginTop: 0 }}
-              animate={{ height: "auto", opacity: 1, marginTop: 16 }}
-              exit={{ height: 0, opacity: 0, marginTop: 0 }}
-              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-              className="overflow-hidden"
-            >
-              <p className="text-sm md:text-[15px] text-muted-foreground/85 leading-relaxed font-light pt-4 border-t border-white/5">
-                {answer}
-              </p>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-    </div>
-  );
-}
-
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -412,8 +294,39 @@ export default function App() {
 
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [isHoveringTestimonials, setIsHoveringTestimonials] = useState(false);
-  const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
+
+  const portfolioScrollRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [translateX, setTranslateX] = useState(0);
+
+  const { scrollYProgress: portfolioScrollY } = useScroll({
+    target: portfolioScrollRef,
+    offset: ["start start", "end end"]
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (scrollRef.current) {
+        const scrollWidth = scrollRef.current.scrollWidth;
+        const clientWidth = scrollRef.current.clientWidth;
+        setTranslateX(Math.max(0, scrollWidth - clientWidth));
+      }
+    };
+    
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    const timer1 = setTimeout(handleResize, 150);
+    const timer2 = setTimeout(handleResize, 600);
+    
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+    };
+  }, []);
+
+  const portfolioX = useTransform(portfolioScrollY, [0, 1], [0, -translateX]);
 
   useEffect(() => {
     if (isHoveringTestimonials) return;
@@ -614,13 +527,30 @@ export default function App() {
         <section ref={heroRef} className="relative pt-20 px-4 md:px-6 min-h-screen lg:min-h-[105vh] flex flex-col items-center justify-between overflow-hidden">
           {/* Animated Background Elements */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute -top-[20%] -left-[10%] w-[50vw] h-[50vw] rounded-full bg-primary/5 blur-[120px] mix-blend-screen animate-pulse" style={{ animationDuration: '8s' }} />
-            <div className="absolute top-[20%] -right-[10%] w-[40vw] h-[40vw] rounded-full bg-blue-500/5 blur-[120px] mix-blend-screen animate-pulse" style={{ animationDuration: '12s', animationDelay: '2s' }} />
-            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay" />
+            {/* Minimalist Background Video */}
+            <div className="absolute inset-0 z-0 opacity-25">
+              <video 
+                autoPlay 
+                loop 
+                muted 
+                playsInline 
+                className="w-full h-full object-cover"
+              >
+                <source src="https://videos.pexels.com/video-files/3773486/3773486-hd_1920_1080_30fps.mp4" type="video/mp4" />
+              </video>
+            </div>
+            
+            {/* Gradient masks for seamless blending */}
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/20 to-background z-10" />
+            
+            {/* Ambient light blobs */}
+            <div className="absolute -top-[20%] -left-[10%] w-[50vw] h-[50vw] rounded-full bg-primary/5 blur-[120px] mix-blend-screen animate-pulse z-20" style={{ animationDuration: '8s' }} />
+            <div className="absolute top-[20%] -right-[10%] w-[40vw] h-[40vw] rounded-full bg-blue-500/5 blur-[120px] mix-blend-screen animate-pulse z-20" style={{ animationDuration: '12s', animationDelay: '2s' }} />
+            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 mix-blend-overlay z-20" />
           </div>
 
           {/* Centered Hero Typography block */}
-          <div className="flex-grow min-h-[70vh] md:min-h-[65vh] flex flex-col justify-center items-center text-center max-w-4xl mx-auto relative z-10 w-full py-8 md:py-12">
+          <div className="flex-grow min-h-[70vh] md:min-h-[65vh] flex flex-col justify-center items-center text-center max-w-4xl mx-auto relative z-30 w-full py-8 md:py-12">
             <motion.div 
               variants={containerVariants}
               initial="hidden"
@@ -690,11 +620,7 @@ export default function App() {
           </div>
 
           {/* Sliding Image Runway Section */}
-          <div className="w-full relative py-12 md:py-20 overflow-hidden select-none">
-            {/* Dark Side Overlays to blur/fade the horizontal edges */}
-            <div className="absolute left-0 inset-y-0 w-16 md:w-32 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
-            <div className="absolute right-0 inset-y-0 w-16 md:w-32 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
-
+          <div className="w-full relative z-30 py-12 md:py-20 overflow-hidden select-none">
             <div className="flex flex-col gap-8 w-full max-w-[100vw]">
               {/* Row 1 - Slides left */}
               <motion.div 
@@ -752,14 +678,14 @@ export default function App() {
         </section>
 
         {/* Separator */}
-        <div className="max-w-5xl lg:max-w-6xl mx-auto px-4 sm:px-8 md:px-12 lg:px-16">
+        <div className="max-w-4xl lg:max-w-5xl mx-auto px-4 sm:px-6 md:px-10 lg:px-12">
           <hr className="border-border" />
         </div>
 
         {/* About Section */}
-        <section id="sobre" className="px-4 sm:px-8 md:px-12 lg:px-16 scroll-mt-32">
-          <div className="max-w-5xl lg:max-w-6xl mx-auto">
-            <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+        <section id="sobre" className="px-4 sm:px-6 md:px-10 lg:px-12 scroll-mt-32">
+          <div className="max-w-4xl lg:max-w-5xl mx-auto">
+            <div className="grid lg:grid-cols-12 gap-8 lg:gap-10 items-start">
               {/* Left Column (Sticky Indicator) */}
               <motion.div 
                 initial={{ opacity: 0, x: -20 }}
@@ -784,7 +710,7 @@ export default function App() {
                   </h3>
                 </RevealItem>
 
-                <RevealItem className="grid md:grid-cols-2 gap-8 text-muted-foreground/80 leading-relaxed text-sm md:text-[15px] font-light">
+                <RevealItem className="grid md:grid-cols-2 gap-5 text-muted-foreground/80 leading-relaxed text-sm md:text-[15px] font-light">
                   <p>
                     Trabalhando desde criança e acompanhando meu pai no ramo da construção civil, peguei gosto e decidi seguir por esse caminho. Há 10 anos a RECONSTRUIR transforma projetos em realidade.
                   </p>
@@ -794,7 +720,7 @@ export default function App() {
                 </RevealItem>
                 
                 {/* Lâmina de Engenharia Grid Columns */}
-                <div className="grid sm:grid-cols-3 gap-6 pt-12 border-t border-white/5">
+                <div className="grid sm:grid-cols-3 gap-4 pt-12 border-t border-white/5">
                   {/* Card 1: 10 Anos */}
                   <RevealItem>
                     <motion.div 
@@ -830,24 +756,24 @@ export default function App() {
                     <motion.div 
                       whileHover={{ y: -4 }}
                       transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                      className="relative group p-6 rounded-xl bg-neutral-900/25 backdrop-blur-sm border border-white/5 hover:border-primary/25 transition-all duration-500 overflow-hidden h-full"
+                      className="relative group p-6 rounded-xl bg-[#EAE6E1] border-none shadow-[0_12px_24px_-8px_rgba(0,0,0,0.3)] transition-all duration-500 overflow-hidden h-full text-neutral-900"
                     >
                       {/* Left structural "Blade" indicator */}
-                      <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-primary/20 group-hover:bg-primary transition-all duration-500" />
+                      <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-neutral-800 transition-all duration-500" />
                       
                       {/* Architectural blueprint grid overlay (subtle) */}
-                      <div className="absolute right-4 top-4 font-mono text-[9px] text-muted-foreground/30 group-hover:text-primary/40 transition-colors duration-500">
+                      <div className="absolute right-4 top-4 font-mono text-[9px] text-neutral-600/40 group-hover:text-neutral-950/60 transition-colors duration-500">
                         SYS // 0.02
                       </div>
                       
                       <div className="space-y-4">
-                        <div className="flex items-center gap-2 text-primary/80">
+                        <div className="flex items-center gap-2 text-neutral-800">
                           <ShieldCheck className="w-3.5 h-3.5" />
-                          <span className="text-[10px] font-mono uppercase tracking-[0.15em]">Confiança</span>
+                          <span className="text-[10px] font-mono uppercase tracking-[0.15em] font-medium">Confiança</span>
                         </div>
                         <div className="space-y-1.5">
-                          <h4 className="font-heading text-lg font-medium text-foreground tracking-tight">Garantia Total</h4>
-                          <p className="text-xs md:text-sm text-muted-foreground/75 leading-relaxed font-light">
+                          <h4 className="font-heading text-lg font-medium text-neutral-950 tracking-tight">Garantia Total</h4>
+                          <p className="text-xs md:text-sm text-neutral-700 leading-relaxed font-normal">
                             Pós-venda ativo e compromisso absoluto com o resultado final.
                           </p>
                         </div>
@@ -891,9 +817,9 @@ export default function App() {
         </section>
 
         {/* Expertise Section */}
-        <section id="servicos" className="px-4 sm:px-8 md:px-12 lg:px-16 scroll-mt-32">
-          <div className="max-w-5xl lg:max-w-6xl mx-auto">
-            <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+        <section id="servicos" className="px-4 sm:px-6 md:px-10 lg:px-12 scroll-mt-32">
+          <div className="max-w-4xl lg:max-w-5xl mx-auto">
+            <div className="grid lg:grid-cols-12 gap-8 lg:gap-10 items-start">
               {/* Left Column (Sticky Indicator) */}
               <motion.div 
                 initial={{ opacity: 0, x: -20 }}
@@ -1014,7 +940,7 @@ export default function App() {
                   </motion.div>
                 </RevealItem>
 
-                <div className="grid md:grid-cols-2 gap-6">
+                <div className="grid md:grid-cols-2 gap-4">
                   {/* Service 3 */}
                   <RevealItem>
                     <motion.div 
@@ -1071,11 +997,11 @@ export default function App() {
                       variants={{
                         hover: { y: -4 }
                       }}
-                      className="relative group overflow-hidden rounded-2xl bg-neutral-900/20 backdrop-blur-sm border border-white/5 hover:border-primary/25 transition-all duration-500 p-1"
+                      className="relative group overflow-hidden rounded-2xl bg-[#853C2D] border-none shadow-[0_12px_24px_-8px_rgba(133,60,45,0.35)] transition-all duration-500 p-1"
                     >
                       {/* Left structural "Blade" indicator */}
                       <motion.div 
-                        className="absolute left-0 bg-primary/20 group-hover:bg-primary transition-colors duration-500"
+                        className="absolute left-0 bg-white/25 group-hover:bg-white transition-colors duration-500"
                         initial={{ height: "32px", width: "2px", top: "24px" }}
                         variants={{
                           hover: { height: "100%", width: "3.5px", top: "0px" }
@@ -1093,18 +1019,18 @@ export default function App() {
                             loading="lazy"
                             decoding="async"
                           />
-                          <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/40 to-transparent pointer-events-none" />
+                          <div className="absolute inset-0 bg-black/10 pointer-events-none" />
                         </div>
                         <div className="p-6 pt-2 space-y-3">
                           <div className="flex items-center justify-between">
-                            <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">Pisos & Revestimentos</span>
-                            <span className="font-mono text-[9px] text-muted-foreground/30 group-hover:text-primary/40 transition-colors duration-500">
+                            <span className="text-[10px] font-mono uppercase tracking-wider text-orange-100/70">Pisos & Revestimentos</span>
+                            <span className="font-mono text-[9px] text-orange-200/40 group-hover:text-white/60 transition-colors duration-500">
                               SYS // RV-04
                             </span>
                           </div>
                           <div className="space-y-1.5">
-                            <h3 className="font-heading text-lg font-medium text-foreground">Revestimentos</h3>
-                            <p className="text-xs md:text-sm text-muted-foreground/75 leading-relaxed font-light">
+                            <h3 className="font-heading text-lg font-medium text-white">Revestimentos</h3>
+                            <p className="text-xs md:text-sm text-orange-50/90 leading-relaxed font-normal">
                               Instalação de porcelanatos e pisos com paginação computadorizada precisa, juntas finas e mínimo de perda material.
                             </p>
                           </div>
@@ -1119,98 +1045,87 @@ export default function App() {
         </section>
 
         {/* Portfolio Section */}
-        <section id="portfolio" className="px-4 sm:px-8 md:px-12 lg:px-16 scroll-mt-32">
-          <div className="max-w-5xl lg:max-w-6xl mx-auto">
-            <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-start">
-              {/* Left Column (Sticky Indicator) */}
-              <motion.div 
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                className="lg:col-span-3 space-y-1.5 lg:sticky lg:top-32"
-              >
-                <span className="text-[10px] md:text-[11px] font-mono tracking-[0.25em] uppercase text-primary font-medium block">
-                  (03) Portfólio
-                </span>
-                <p className="text-muted-foreground text-xs md:text-sm font-light uppercase tracking-widest block">
-                  Estética em concreto e aço.
-                </p>
-                <div className="pt-8 hidden lg:block">
-                  <a 
-                    href="https://instagram.com" 
-                    target="_blank" 
-                    rel="noreferrer" 
-                    className="inline-flex items-center gap-1.5 text-primary text-[10px] font-mono uppercase tracking-wider hover:text-primary/80 transition-colors"
-                  >
-                    // Ver no Instagram <ArrowRight className="w-3.5 h-3.5" />
-                  </a>
-                </div>
-              </motion.div>
-
-              {/* Right Column (Content) */}
-              <div className="lg:col-span-9 space-y-12">
-                <RevealHeading className="font-heading text-2xl md:text-4xl lg:text-[2.75rem] font-light tracking-tight text-balance leading-[1.2] text-foreground">
-                  <h3>
+        <section 
+          id="portfolio" 
+          ref={portfolioScrollRef}
+          className="relative h-[250vh] sm:h-[300vh] w-full"
+        >
+          <div className="sticky top-0 h-screen w-full flex flex-col justify-center overflow-hidden px-4 sm:px-6 md:px-10 lg:px-12 py-10">
+            <div className="max-w-5xl mx-auto w-full space-y-8 md:space-y-12">
+              {/* Header block spanning the entire width */}
+              <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/5 pb-6">
+                <div className="space-y-1.5 max-w-2xl">
+                  <span className="text-[10px] md:text-[11px] font-mono tracking-[0.25em] uppercase text-primary font-medium block">
+                    (03) Portfólio
+                  </span>
+                  <h3 className="font-heading text-2xl sm:text-3xl md:text-4xl lg:text-[2.75rem] font-light tracking-tight text-foreground leading-[1.2] text-balance">
                     Projetos executados sob o rigor da <span className="text-white font-normal">máxima precisão</span>.
                   </h3>
-                </RevealHeading>
-
-                <div className="space-y-16 md:space-y-28">
-                  {/* Project 1 */}
-                  <PortfolioCard 
-                    idCode="// PROJETO RES-01"
-                    area="450m²"
-                    title="Residência Minimalista de Alto Padrão"
-                    imgUrl="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=50"
-                    widthClass="w-full md:w-[95%]"
-                    heightClass="h-[400px] md:h-[520px]"
-                    index={0}
-                  />
-
-                  {/* Project 2 */}
-                  <PortfolioCard 
-                    idCode="// PROJETO COM-02"
-                    area="1.200m²"
-                    title="Sede Corporativa Concept"
-                    imgUrl="https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=800&q=50"
-                    widthClass="w-full md:w-[85%] md:ml-auto"
-                    heightClass="h-[400px] md:h-[520px]"
-                    index={1}
-                  />
-
-                  {/* Project 3 */}
-                  <PortfolioCard 
-                    idCode="// PROJETO INT-03"
-                    area="180m²"
-                    title="Apartamento Loft Industrial"
-                    imgUrl="https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=800&q=50"
-                    widthClass="w-full md:w-[90%]"
-                    heightClass="h-[380px] md:h-[480px]"
-                    index={2}
-                  />
                 </div>
-
-                {/* Mobile Instagram link */}
-                <div className="pt-4 block lg:hidden text-center">
+                <div className="flex items-center gap-4">
+                  <span className="hidden md:inline font-mono text-[10px] text-muted-foreground/30 uppercase tracking-widest">// Role para baixo</span>
                   <a 
                     href="https://instagram.com" 
                     target="_blank" 
                     rel="noreferrer" 
                     className="inline-flex items-center gap-1.5 text-primary text-[10px] font-mono uppercase tracking-wider hover:text-primary/80 transition-colors"
                   >
-                    // Ver mais no Instagram <ArrowRight className="w-3.5 h-3.5" />
+                    Ver no Instagram <ArrowRight className="w-3.5 h-3.5" />
                   </a>
                 </div>
+              </div>
+
+              {/* Dynamic Horizontal Track */}
+              <div className="relative w-full overflow-hidden" ref={scrollRef}>
+                <motion.div 
+                  style={{ x: portfolioX }} 
+                  className="flex gap-6 md:gap-8 w-max pr-12 py-2"
+                >
+                  <div className="w-[340px] sm:w-[460px] md:w-[560px] lg:w-[600px] flex-shrink-0">
+                    <PortfolioCard 
+                      idCode="// PROJETO RES-01"
+                      area="450m²"
+                      title="Residência Minimalista de Alto Padrão"
+                      imgUrl="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=50"
+                      widthClass="w-full"
+                      heightClass="h-[320px] sm:h-[380px] md:h-[460px] lg:h-[480px]"
+                      index={0}
+                    />
+                  </div>
+
+                  <div className="w-[340px] sm:w-[460px] md:w-[560px] lg:w-[600px] flex-shrink-0">
+                    <PortfolioCard 
+                      idCode="// PROJETO COM-02"
+                      area="1.200m²"
+                      title="Sede Corporativa Concept"
+                      imgUrl="https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=800&q=50"
+                      widthClass="w-full"
+                      heightClass="h-[320px] sm:h-[380px] md:h-[460px] lg:h-[480px]"
+                      index={1}
+                    />
+                  </div>
+
+                  <div className="w-[340px] sm:w-[460px] md:w-[560px] lg:w-[600px] flex-shrink-0">
+                    <PortfolioCard 
+                      idCode="// PROJETO INT-03"
+                      area="180m²"
+                      title="Apartamento Loft Industrial"
+                      imgUrl="https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=800&q=50"
+                      widthClass="w-full"
+                      heightClass="h-[320px] sm:h-[380px] md:h-[460px] lg:h-[480px]"
+                      index={2}
+                    />
+                  </div>
+                </motion.div>
               </div>
             </div>
           </div>
         </section>
 
         {/* Testimonials Section */}
-        <section id="depoimentos" className="px-4 sm:px-8 md:px-12 lg:px-16 scroll-mt-32">
-          <div className="max-w-5xl lg:max-w-6xl mx-auto">
-            <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+        <section id="depoimentos" className="px-4 sm:px-6 md:px-10 lg:px-12 scroll-mt-32">
+          <div className="max-w-4xl lg:max-w-5xl mx-auto">
+            <div className="grid lg:grid-cols-12 gap-8 lg:gap-10 items-start">
               {/* Left Column (Sticky Indicator) */}
               <motion.div 
                 initial={{ opacity: 0, x: -20 }}
@@ -1249,6 +1164,23 @@ export default function App() {
                         whileHover={{ height: "100%", width: "4px", top: "0px" }}
                         transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
                       />
+
+                      {/* Dynamic Background Image Transition based on Active Testimonial's Project */}
+                      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+                        <AnimatePresence mode="wait">
+                          <motion.div
+                            key={activeTestimonial}
+                            initial={{ opacity: 0, scale: 1.05 }}
+                            animate={{ opacity: 0.07, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                            className="absolute inset-0 w-full h-full bg-cover bg-center filter grayscale contrast-[1.3] brightness-50"
+                            style={{ backgroundImage: `url(${TESTIMONIALS[activeTestimonial].bgImage})` }}
+                          />
+                        </AnimatePresence>
+                        {/* Soft vignette overlay */}
+                        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-neutral-950/60 opacity-80" />
+                      </div>
 
                       {/* Aesthetic blueprint grid lines overlay */}
                       <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none opacity-40 group-hover:opacity-70 transition-opacity duration-500" />
@@ -1349,60 +1281,10 @@ export default function App() {
           </div>
         </section>
 
-        {/* FAQ Section */}
-        <section id="faq" className="px-4 sm:px-8 md:px-12 lg:px-16 scroll-mt-32">
-          <div className="max-w-5xl lg:max-w-6xl mx-auto">
-            <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-start">
-              {/* Left Column (Sticky Indicator) */}
-              <motion.div 
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                className="lg:col-span-3 space-y-1.5 lg:sticky lg:top-32"
-              >
-                <span className="text-[10px] md:text-[11px] font-mono tracking-[0.25em] uppercase text-primary font-medium block">
-                  (05) FAQ
-                </span>
-                <p className="text-muted-foreground text-xs md:text-sm font-light uppercase tracking-widest block">
-                  Esclarecendo dúvidas técnicas.
-                </p>
-              </motion.div>
-
-              {/* Right Column (Content) */}
-              <div className="lg:col-span-9 space-y-12">
-                <RevealStagger className="space-y-8">
-                  <RevealItem>
-                    <h3 className="font-heading text-2xl md:text-4xl lg:text-[2.75rem] font-light tracking-tight text-balance leading-[1.2] text-foreground">
-                      Respostas diretas para as suas <span className="text-white font-normal">principais dúvidas</span>.
-                    </h3>
-                  </RevealItem>
-
-                  <RevealItem>
-                    <div className="space-y-4">
-                      {FAQS.map((faq) => (
-                        <FAQItem
-                          key={faq.id}
-                          question={faq.question}
-                          answer={faq.answer}
-                          code={faq.code}
-                          tag={faq.tag}
-                          isOpen={openFaq === faq.id}
-                          onToggle={() => setOpenFaq(openFaq === faq.id ? null : faq.id)}
-                        />
-                      ))}
-                    </div>
-                  </RevealItem>
-                </RevealStagger>
-              </div>
-            </div>
-          </div>
-        </section>
-
         {/* CTA Section */}
-        <section id="contato" className="px-4 sm:px-8 md:px-12 lg:px-16 scroll-mt-32">
-          <div className="max-w-5xl lg:max-w-6xl mx-auto">
-            <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+        <section id="contato" className="px-4 sm:px-6 md:px-10 lg:px-12 scroll-mt-32">
+          <div className="max-w-4xl lg:max-w-5xl mx-auto">
+            <div className="grid lg:grid-cols-12 gap-8 lg:gap-10 items-start">
               {/* Left Column (Sticky Indicator) */}
               <motion.div 
                 initial={{ opacity: 0, x: -20 }}
@@ -1412,7 +1294,7 @@ export default function App() {
                 className="lg:col-span-3 space-y-1.5 lg:sticky lg:top-32"
               >
                 <span className="text-[10px] md:text-[11px] font-mono tracking-[0.25em] uppercase text-primary font-medium block">
-                  (06) Contato
+                  (05) Contato
                 </span>
                 <p className="text-muted-foreground text-xs md:text-sm font-light uppercase tracking-widest block">
                   Inicie o seu projeto.
@@ -1488,8 +1370,8 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-white/5 bg-neutral-950/20 backdrop-blur-sm pt-20 pb-12 px-4 sm:px-8 md:px-12 lg:px-16">
-        <div className="max-w-5xl lg:max-w-6xl mx-auto">
+      <footer className="border-t border-white/5 bg-neutral-950/20 backdrop-blur-sm pt-20 pb-12 px-4 sm:px-6 md:px-10 lg:px-12">
+        <div className="max-w-4xl lg:max-w-5xl mx-auto">
           <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-start mb-16">
             {/* Left Column (Brand Identity & Philosophy) */}
             <div className="lg:col-span-3 space-y-6">
@@ -1561,11 +1443,6 @@ export default function App() {
                   <li>
                     <a href="#depoimentos" className="hover:text-white hover:underline decoration-primary/50 underline-offset-4 transition-colors duration-300">
                       Depoimentos
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#faq" className="hover:text-white hover:underline decoration-primary/50 underline-offset-4 transition-colors duration-300">
-                      FAQ
                     </a>
                   </li>
                 </ul>
